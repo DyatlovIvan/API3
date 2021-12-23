@@ -4,6 +4,7 @@ import {Dispatch} from 'redux'
 import {AppRootStateType} from '../../app/store'
 import {setAppError, SetAppErrorType, setAppStatusAC, SetAppStatusACType} from "../../app/app-reducer";
 import {AxiosError} from "axios";
+import {HandleServerAppError, HandleServerNetworkError} from "../../utils/error-utils";
 
 const initialState: TasksStateType = {}
 
@@ -73,21 +74,10 @@ export const addTaskTC = (title: string, todolistId: string) => (dispatch: Dispa
     dispatch(setAppStatusAC('loading'))
     todolistsAPI.createTask(todolistId, title)
         .then(res => {
-            if (res.data.resultCode === 0) {
-                const task = res.data.data.item
-                const action = addTaskAC(task)
-                dispatch(action)
-
-            } else {
-                if (res.data.messages.length) {
-                    dispatch(setAppError(res.data.messages[0]))
-                } else {
-                    dispatch(setAppError('Some error'))
-                }
-            }
+            HandleServerAppError(dispatch,res.data)
         })
         .catch((err:AxiosError)=>{
-            dispatch(setAppError(err.message))
+            HandleServerNetworkError(dispatch,err.message)
         })
         .finally(()=>{
             dispatch(setAppStatusAC('idle'))

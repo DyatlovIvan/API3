@@ -7,6 +7,8 @@ import {
     setAppStatusAC,
     SetAppStatusACType
 } from "../../app/app-reducer";
+import {AxiosError} from "axios";
+import {HandleServerNetworkError} from "../../utils/error-utils";
 
 const initialState: Array<TodolistDomainType> = []
 
@@ -89,6 +91,9 @@ export const addTodolistTC = (title: string) => {
                     }
                     dispatch(setAppStatusAC('failed'))
                 }
+            })
+            .catch((err:AxiosError)=>{
+                HandleServerNetworkError(dispatch,err.message)
             })
     }
 }
